@@ -162,7 +162,43 @@ app.delete("/delete_publication/:id", async (req, res) => {
       .send({ error: "Invalid ID or failed to delete publication." });
   }
 });
-
+// Certifications api ------>
+app.get("/all_certificates", async (req, res) => {
+  const result = await CertificatesCollection.find()
+    .sort({ _id: -1 })
+    .toArray();
+  res.send(result);
+});
+app.post("/add_certificate", async (req, res) => {
+  const data = {
+    ...req.body,
+    createdAt: new Date(),
+  };
+  const result = await CertificatesCollection.insertOne(data);
+  res.send(result);
+});
+app.patch("/update_certificate/:id", async (req, res) => {
+  const id = req.params.id;
+  const data = req.body;
+  const query = { _id: new ObjectId(id) };
+  const updatedDoc = {
+    $set: { ...data },
+  };
+  const result = await CertificatesCollection.updateOne(query, updatedDoc);
+  res.send(result);
+});
+app.delete("/delete_certificate/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const query = { _id: new ObjectId(id) };
+    const result = await CertificatesCollection.deleteOne(query);
+    res.send(result);
+  } catch (err) {
+    res
+      .status(400)
+      .send({ error: "Invalid ID or failed to delete certificate." });
+  }
+});
 // main api section ends here --->
 // -----------------
 // Sample route
