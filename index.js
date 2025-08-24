@@ -36,6 +36,7 @@ let ActivitiesCollection;
 let LeadershipCollection;
 let ReviewsCollection;
 let SkillsCollection;
+let EducationCollection;
 
 // -----------------
 // Run MongoDB connection
@@ -55,6 +56,7 @@ async function run() {
     LeadershipCollection = db.collection("leadership");
     ReviewsCollection = db.collection("reviews");
     SkillsCollection = db.collection("skills");
+    EducationCollection = db.collection("education");
 
     console.log("✅ Successfully connected to MongoDB!");
   } catch (error) {
@@ -402,6 +404,41 @@ app.delete("/delete_skill/:id", async (req, res) => {
   }
 });
 
+// education
+app.get("/education", async (req, res) => {
+  const result = await EducationCollection.find().sort({ _id: -1 }).toArray();
+  res.send(result);
+});
+app.post("/add_education", async (req, res) => {
+  const data = {
+    ...req.body,
+    createdAt: new Date(),
+  };
+  const result = await EducationCollection.insertOne(data);
+  res.send(result);
+});
+app.patch("/update_education/:id", async (req, res) => {
+  const id = req.params.id;
+  const data = req.body;
+  const query = { _id: new ObjectId(id) };
+  const updatedDoc = {
+    $set: { ...data },
+  };
+  const result = await EducationCollection.updateOne(query, updatedDoc);
+  res.send(result);
+});
+app.delete("/delete_education/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const query = { _id: new ObjectId(id) };
+    const result = await EducationCollection.deleteOne(query);
+    res.send(result);
+  } catch (err) {
+    res
+      .status(400)
+      .send({ error: "Invalid ID or failed to delete education." });
+  }
+});
 // main api section ends here --->
 // -----------------
 // Sample route
