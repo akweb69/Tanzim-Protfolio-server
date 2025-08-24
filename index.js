@@ -199,6 +199,69 @@ app.delete("/delete_certificate/:id", async (req, res) => {
       .send({ error: "Invalid ID or failed to delete certificate." });
   }
 });
+// Experience api ------>
+app.get("/all_experience", async (req, res) => {
+  const result = await ExperienceCollection.find().sort({ _id: -1 }).toArray();
+  res.send(result);
+});
+app.post("/add_experience", async (req, res) => {
+  const data = {
+    ...req.body,
+    createdAt: new Date(),
+  };
+  const result = await ExperienceCollection.insertOne(data);
+  res.send(result);
+});
+
+app.patch("/update_experience/:id", async (req, res) => {
+  const id = req.params.id;
+  const data = req.body;
+  const query = { _id: new ObjectId(id) };
+  const updatedDoc = {
+    $set: { ...data },
+  };
+  const result = await ExperienceCollection.updateOne(query, updatedDoc);
+  res.send(result);
+});
+app.delete("/delete_experience/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const query = { _id: new ObjectId(id) };
+    const result = await ExperienceCollection.deleteOne(query);
+    res.send(result);
+  } catch (err) {
+    res
+      .status(400)
+      .send({ error: "Invalid ID or failed to delete experience." });
+  }
+});
+// Get all gallery images
+app.get("/all_gallery", async (req, res) => {
+  const result = await GalleryCollection.find().sort({ _id: -1 }).toArray();
+  res.send(result);
+});
+
+// Add a new gallery image
+app.post("/add_gallery", async (req, res) => {
+  const data = {
+    ...req.body,
+    createdAt: new Date(),
+  };
+  const result = await GalleryCollection.insertOne(data);
+  res.send(result);
+});
+
+// Delete a gallery image
+app.delete("/delete_gallery/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const query = { _id: new ObjectId(id) };
+    const result = await GalleryCollection.deleteOne(query);
+    res.send(result);
+  } catch (err) {
+    res.status(400).send({ error: "Invalid ID or failed to delete image." });
+  }
+});
 // main api section ends here --->
 // -----------------
 // Sample route
