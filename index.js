@@ -34,6 +34,7 @@ let CertificatesCollection;
 let PublicationsCollection;
 let ActivitiesCollection;
 let LeadershipCollection;
+let ReviewsCollection;
 
 // -----------------
 // Run MongoDB connection
@@ -51,6 +52,7 @@ async function run() {
     PublicationsCollection = db.collection("publications");
     ActivitiesCollection = db.collection("activities");
     LeadershipCollection = db.collection("leadership");
+    ReviewsCollection = db.collection("reviews");
 
     console.log("✅ Successfully connected to MongoDB!");
   } catch (error) {
@@ -328,6 +330,39 @@ app.delete("/delete_leadership/:id", async (req, res) => {
     res
       .status(400)
       .send({ error: "Invalid ID or failed to delete leadership." });
+  }
+});
+// manage reviews ->
+app.get("/reviews", async (req, res) => {
+  const result = await ReviewsCollection.find().sort({ _id: -1 }).toArray();
+  res.send(result);
+});
+app.post("/add_review", async (req, res) => {
+  const data = {
+    ...req.body,
+    createdAt: new Date(),
+  };
+  const result = await ReviewsCollection.insertOne(data);
+  res.send(result);
+});
+app.patch("/update_review/:id", async (req, res) => {
+  const id = req.params.id;
+  const data = req.body;
+  const query = { _id: new ObjectId(id) };
+  const updatedDoc = {
+    $set: { ...data },
+  };
+  const result = await ReviewsCollection.updateOne(query, updatedDoc);
+  res.send(result);
+});
+app.delete("/delete_review/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const query = { _id: new ObjectId(id) };
+    const result = await ReviewsCollection.deleteOne(query);
+    res.send(result);
+  } catch (err) {
+    res.status(400).send({ error: "Invalid ID or failed to delete review." });
   }
 });
 
