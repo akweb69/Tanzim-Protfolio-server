@@ -262,6 +262,40 @@ app.delete("/delete_gallery/:id", async (req, res) => {
     res.status(400).send({ error: "Invalid ID or failed to delete image." });
   }
 });
+// manage activities-->
+app.get("/all_activities", async (req, res) => {
+  const result = await ActivitiesCollection.find().sort({ _id: -1 }).toArray();
+  res.send(result);
+});
+app.post("/add_activity", async (req, res) => {
+  const data = {
+    ...req.body,
+    createdAt: new Date(),
+  };
+  const result = await ActivitiesCollection.insertOne(data);
+  res.send(result);
+});
+app.patch("/update_activity/:id", async (req, res) => {
+  const id = req.params.id;
+  const data = req.body;
+  const query = { _id: new ObjectId(id) };
+  const updatedDoc = {
+    $set: { ...data },
+  };
+  const result = await ActivitiesCollection.updateOne(query, updatedDoc);
+  res.send(result);
+});
+app.delete("/delete_activity/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const query = { _id: new ObjectId(id) };
+    const result = await ActivitiesCollection.deleteOne(query);
+    res.send(result);
+  } catch (err) {
+    res.status(400).send({ error: "Invalid ID or failed to delete activity." });
+  }
+});
+
 // main api section ends here --->
 // -----------------
 // Sample route
