@@ -85,7 +85,11 @@ app.patch("/update_settings/:id", async (req, res) => {
 // manage appointments apis------>
 
 app.post("/add_appointment", async (req, res) => {
-  const data = req.body;
+  const data = {
+    ...req.body,
+    createdAt: new Date(),
+    disabled: false,
+  };
   const result = await AppoinmentsCollection.insertOne(data);
   res.send(result);
 });
@@ -97,9 +101,29 @@ app.get("/all_appointments", async (req, res) => {
 
 app.delete("/delete_appointment/:id", async (req, res) => {
   const id = req.params.id;
-  const query = { _id: new ObjectId(id) };
-  const result = await AppoinmentsCollection.deleteOne(query);
-  res.send(result);
+  try {
+    const query = { _id: new ObjectId(id) };
+    const result = await AppoinmentsCollection.deleteOne(query);
+    res.send(result);
+  } catch (err) {
+    res
+      .status(400)
+      .send({ error: "Invalid ID or failed to delete appointment." });
+  }
+});
+
+app.patch("/update_appointment/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const query = { _id: new ObjectId(id) };
+    const update = { $set: { disabled: true } };
+    const result = await AppoinmentsCollection.updateOne(query, update);
+    res.send(result);
+  } catch (err) {
+    res
+      .status(400)
+      .send({ error: "Invalid ID or failed to update appointment." });
+  }
 });
 
 // main api section ends here --->
