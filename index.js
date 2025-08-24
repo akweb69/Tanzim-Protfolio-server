@@ -295,6 +295,41 @@ app.delete("/delete_activity/:id", async (req, res) => {
     res.status(400).send({ error: "Invalid ID or failed to delete activity." });
   }
 });
+// manage leadership-->
+app.get("/leadership", async (req, res) => {
+  const result = await LeadershipCollection.find().sort({ _id: -1 }).toArray();
+  res.send(result);
+});
+app.post("/add_leadership", async (req, res) => {
+  const data = {
+    ...req.body,
+    createdAt: new Date(),
+  };
+  const result = await LeadershipCollection.insertOne(data);
+  res.send(result);
+});
+app.patch("/update_leadership/:id", async (req, res) => {
+  const id = req.params.id;
+  const data = req.body;
+  const query = { _id: new ObjectId(id) };
+  const updatedDoc = {
+    $set: { ...data },
+  };
+  const result = await LeadershipCollection.updateOne(query, updatedDoc);
+  res.send(result);
+});
+app.delete("/delete_leadership/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const query = { _id: new ObjectId(id) };
+    const result = await LeadershipCollection.deleteOne(query);
+    res.send(result);
+  } catch (err) {
+    res
+      .status(400)
+      .send({ error: "Invalid ID or failed to delete leadership." });
+  }
+});
 
 // main api section ends here --->
 // -----------------
