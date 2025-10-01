@@ -468,7 +468,7 @@ app.post("/references", async (req, res) => {
 });
 app.get("/references", async (req, res) => {
   const cursor = db.collection("references").find();
-  const result = await cursor.sort({ _id: -1 }).toArray;
+  const result = await cursor.sort({ _id: -1 }).toArray();
   res.send(result);
 });
 app.delete("/references/:id", async (req, res) => {
