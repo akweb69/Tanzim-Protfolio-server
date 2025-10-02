@@ -489,3 +489,47 @@ app.post("/settings", async (req, res) => {
   const result = await db.collection("settings").insertOne(data);
   res.send(result);
 });
+// leadership section
+app.post("/leadership", async (req, res) => {
+  const data = req.body;
+  const result = await db.collection("leadership").insertOne(data);
+  res.send(result);
+});
+app.get("/leadership", async (req, res) => {
+  const cursor = db.collection("leadership").find();
+  const result = await cursor.sort({ _id: -1 }).toArray();
+  res.send(result);
+});
+app.delete("/leadership/:id", async (req, res) => {
+  const id = req.params.id;
+  const query = { _id: new ObjectId(id) };
+  const result = await db.collection("leadership").deleteOne(query);
+  res.send(result);
+});
+app.patch("/leadership/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const data = req.body;
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid leadership ID" });
+    }
+    const query = { _id: new ObjectId(id) };
+    const updateDoc = {
+      $set: {
+        ...data,
+        updatedAt: new Date(),
+      },
+    };
+    const result = await db
+      .collection("leadership")
+      .updateOne(query, updateDoc);
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({ error: "Leadership not found" });
+    }
+    res.json(result);
+  } catch (error) {
+    console.error("Error updating leadership:", error);
+    res.status(500).json({ error: "Failed to update leadership" });
+  }
+});
+// end of leadership section
